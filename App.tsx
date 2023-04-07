@@ -81,11 +81,11 @@ export const App = ({ watchList, exportOps }: AppProps) => {
       setIncludeWatchList(e.currentTarget.checked),
     [],
   );
-  const [isOpen, { open, close }] = useOpen(false);
-  const exportRef = useRef<UseOpenOperators>({ open, close });
+  const [isOpen, { open, close, toggle }] = useOpen(false);
+  const exportRef = useRef<UseOpenOperators>({ open, close, toggle });
   useEffect(() => {
-    Object.assign(exportRef.current, { open, close });
-  }, [open, close]);
+    Object.assign(exportRef.current, { open, close, toggle });
+  }, [open, close, toggle]);
   useEffect(() => exportOps(exportRef.current), [exportOps]);
 
   return (

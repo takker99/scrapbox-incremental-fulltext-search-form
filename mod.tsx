@@ -11,6 +11,9 @@ export interface Operators {
 
   /** formを閉じる */
   close: () => void;
+
+  /** 開閉切り替え */
+  toggle: () => void;
 }
 
 /** search formを起動する
