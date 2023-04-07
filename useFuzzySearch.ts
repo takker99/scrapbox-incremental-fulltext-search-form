@@ -1,5 +1,5 @@
-import { useMemo } from "../deps/preact.tsx";
-import { Asearch } from "../deps/asearch.ts";
+import { useMemo } from "./deps/preact.tsx";
+import { Asearch } from "./deps/asearch.ts";
 
 /** あいまい検索するhook
  *
@@ -7,12 +7,12 @@ import { Asearch } from "../deps/asearch.ts";
  * @param 検索候補
  * @param 検索候補を検索用文字列に変換する函数
  */
-export function useFuzzySearch<T>(
+export const useFuzzySearch = <T>(
   query: string,
   candidates: T[],
   converter: (candidate: T) => string,
-) {
-  return useMemo(() => {
+) =>
+  useMemo(() => {
     if (!query || query === "") return candidates;
 
     const { match } = Asearch(` ${query} `);
@@ -21,4 +21,3 @@ export function useFuzzySearch<T>(
       return result.found ? [[candidate, result.distance]] as const : [];
     }).sort((a, b) => a[1] - b[1]).map(([candidate]) => candidate);
   }, [query, candidates, converter]);
-}

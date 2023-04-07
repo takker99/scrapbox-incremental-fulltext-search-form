@@ -2,11 +2,16 @@
 /// <reference lib="esnext" />
 /// <reference lib="dom" />
 /** @jsx h */
-import { h, useCallback, useEffect, useState } from "../deps/preact.tsx";
-import type { RefCallback } from "../deps/preact.tsx";
-import { useFuzzySearch } from "../hooks/useFuzzySearch.ts";
-import { useScrollItemIntoView } from "../hooks/useScrollItemIntoView.ts";
-import { useSelect } from "../hooks/useSelect.ts";
+import {
+  h,
+  RefCallback,
+  useCallback,
+  useEffect,
+  useState,
+} from "./deps/preact.tsx";
+import { useFuzzySearch } from "./useFuzzySearch.ts";
+import { useScrollItemIntoView } from "./useScrollItemIntoView.ts";
+import { useSelect } from "./useSelect.ts";
 
 interface Position {
   top: number;

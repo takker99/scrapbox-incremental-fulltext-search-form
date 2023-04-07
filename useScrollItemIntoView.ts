@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef } from "../deps/preact.tsx";
+import { useEffect, useMemo, useRef } from "./deps/preact.tsx";
 
 /** リスト中の要素が描画領域内に収まるように自動でスクロールするhook */
-export function useScrollItemIntoView<E extends Element, T>(
+export const useScrollItemIntoView = <E extends Element, T>(
   items: T[],
   selected: T | undefined,
   makeKey: (item: T) => string,
-) {
+) => {
   const props = useMemo(
     () =>
       items.map((item) => ({ "data-key": makeKey(item) }), [
@@ -49,4 +49,4 @@ export function useScrollItemIntoView<E extends Element, T>(
   }, [selected, makeKey]);
 
   return props;
-}
+};

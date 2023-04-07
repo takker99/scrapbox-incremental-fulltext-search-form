@@ -1,11 +1,13 @@
-import { useCallback, useMemo, useState } from "../deps/preact.tsx";
+import { useCallback, useMemo, useState } from "./deps/preact.tsx";
 
 export interface Options {
-  /** 初期選択項目の番号 */ defaultSelected?: number;
+  /** 初期選択項目の番号 */
+  defaultSelected?: number;
 }
-export function useSelect<T>(list: T[], {
+
+export const useSelect = <T>(list: T[], {
   defaultSelected,
-}: Options = {}) {
+}: Options = {}) => {
   const [index, setIndex] = useState(defaultSelected); // 未選択のときはundefinedになる
   const item = useMemo(
     () => index === undefined ? undefined : list[index],
@@ -35,4 +37,4 @@ export function useSelect<T>(list: T[], {
     selectNext,
     blur,
   };
-}
+};

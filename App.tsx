@@ -9,28 +9,28 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "./deps/preact.tsx";
-import { FuzzySelect } from "./components/FuzzySelect.tsx";
-import { ErrorMessage } from "./components/ErrorMessage.tsx";
-import { Card } from "./components/Card.tsx";
-import { useOpen } from "./hooks/useOpen.ts";
-import { useSearch } from "./hooks/useSearch.ts";
-import { useProjectSearch } from "./hooks/useProjectSearch.ts";
-import { CSS } from "./style.css.min.ts";
+import { FuzzySelect, Item } from "./FuzzySelect.tsx";
+import { Card } from "./Card.tsx";
+import { useOpen, UseOpenOperators } from "./useOpen.ts";
+import { useSearch } from "./useSearch.ts";
+import { useProjectSearch } from "./useProjectSearch.ts";
+import { CSS } from "./CSS.tsx";
 import type { Scrapbox } from "./deps/scrapbox.ts";
 declare const scrapbox: Scrapbox;
 
 const Spinner = () => <i className="" />;
 
-const openForm: (() => void) | undefined;
-const converter = ({ key, text }) => `${key} ${text}`;
-interface Props {
+const converter = ({ key, text }: Item) => `${key} ${text}`;
+
+export interface AppProps {
   watchList: string[];
+  exportOps: (init: UseOpenOperators) => void;
 }
-function App({ watchList }: Props) {
-  const [isOpen, { open, close }] = useOpen(false);
-  const [project, setProject] = useState(scrapbox.Project.name ?? "help-jp");
+
+export const App = ({ watchList, exportOps }: AppProps) => {
   const [query, setQuery] = useState("");
   const [disabled, setDisabled] = useState(true);
   // ボタンの状態から、横断検索の開始を判定する
@@ -38,15 +38,19 @@ function App({ watchList }: Props) {
     disabled,
     query,
   ]);
+  // project横断検索を開始したら、開始ボタンを無効化する
+  const onFilter = useCallback(() => setDisabled(true), []);
 
   const [includeWatchList, setIncludeWatchList] = useState(false);
-  const { loading, items } = useSearch({ project, query }); // 全文検索する
-  const { searching, error, projects } = useProjectSearch({ // projectを横断検索する
-    query: queryForProject,
-    watchList: watchList,
+  const watchList_ = useMemo(() => includeWatchList ? watchList : [], [
     includeWatchList,
+    watchList,
+  ]);
+  const { searching, error, projects } = useProjectSearch(queryForProject, {
+    watchList: watchList_,
   });
-  // FuzzySelect用にデータを加工する
+
+  /** FuzzySelect用データ */
   const list = useMemo(
     () =>
       projects.map(({ name, displayName }) => ({
@@ -59,113 +63,94 @@ function App({ watchList }: Props) {
   // 横断検索のAPI limitに引っかかっているときはボタンを無効化する
   useEffect(() => error && setDisabled(true), [error]);
 
+  const [project, setProject] = useState(scrapbox.Project.name);
   // 入力欄の値を反映する
-  const onProjectChange = ({ key }) => setProject(key);
-  const onInput = ({ target: { value } }) => {
-    setDisabled(false);
-    setQuery(value);
-  };
+  const onProjectChange = useCallback(({ key }: Item) => setProject(key), []);
+  // 全文検索する
+  const { loading, items } = useSearch(project, query);
 
-  /** <Esc>を押したら検索フォームを閉じる */
-  const handleKeydown = useCallback(({ key }) => {
-    if (key !== "Escape") return;
-    close();
-  }, []);
-
-  // 検索結果アイテムを押したときの動作
-  // 同じタブでページを開くときは、検索フォームを一旦閉じる
-  const handleClick = useCallback(
-    ({ ctrlKey, shiftKey, altKey, metaKey, target }) => {
-      if (
-        target.target === "_blank" || ctrlKey || shiftKey || altKey || metaKey
-      ) {
-        return;
-      }
-      close();
+  const handleInput = useCallback(
+    (e: h.JSX.TargetedEvent<HTMLInputElement, Event>) => {
+      setDisabled(false);
+      setQuery(e.currentTarget.value);
     },
     [],
   );
-
-  // project横断検索を開始したら、開始ボタンを無効化する
-  const onFilter = useCallback(() => setDisabled(true), []);
-
-  // Componentの外から検索フォームを開けるようにする
-  useEffect(() => openForm = open, []);
+  const handleChecked = useCallback(
+    (e: h.JSX.TargetedEvent<HTMLInputElement, Event>) =>
+      setIncludeWatchList(e.currentTarget.checked),
+    [],
+  );
+  const [isOpen, { open, close }] = useOpen(false);
+  const exportRef = useRef<UseOpenOperators>({ open, close });
+  useEffect(() => {
+    Object.assign(exportRef.current, { open, close });
+  }, [open, close]);
+  useEffect(() => exportOps(exportRef.current), [exportOps]);
 
   return (
     <>
-      <style>{CSS}</style>
-      <div hidden={isOpen}>
-        <Background onClose={close} />
-        {/*どのcomponentsにfocusが当たっていても、フォームを閉じるショートカットキーを検知できるようにするためにcapture modeを用いている*/}
-        <div className="container" onKeydownCapture={handleKeydown}>
-          <div className="search-form">
-            <FuzzySelect
-              list={list}
-              converter={converter}
-              onSelect={onProjectChange}
-            />
-            <input type="text" value={query} onInput={onInput} />
-            <button type="button" onClick={onFilter} disabled={disabled}>
-              {disabled
-                ? (
-                  <>
-                    {searching && <Spinner />}
-                    {`Found ${projects.length} projects`}
-                  </>
-                )
-                : <>Search all projects</>}
-            </button>
-            <input
-              type="checkbox"
-              value={!includeWatchList}
-              onChange={({ target }) => setIncludeWatchList(target.value)}
-            />
-            <label>Search besides watch list</label>
-            <span className="info">
-              {loading
-                ? (
-                  <>
-                    <Spinner />
-                    {`Searching for ${query}...`}
-                  </>
-                )
-                : <>{`${items.length} results`}</>}
-            </span>
-            <ErrorMessage error={error} />
-          </div>
-          {items.length > 0 &&
-            (
-              <ul className="dropdown">
-                {items.map((item) => (
-                  <li key={item.title}>
-                    <Card
-                      item={item}
-                      baseProject={scrapbox.Project.name ?? "help-jp"}
-                      onClick={handleClick}
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
+      <CSS />
+      <div
+        id="background"
+        className={`modal${!isOpen ? " closed" : ""}`}
+        onClick={close}
+      >
+        <div className="controller">
+          <button className="close-button" onClick={close}>x</button>
+          <FuzzySelect
+            list={list}
+            convert={converter}
+            onSelect={onProjectChange}
+          />
+          <input type="text" value={query} onInput={handleInput} />
+          <button type="button" onClick={onFilter} disabled={disabled}>
+            {disabled
+              ? (
+                <>
+                  {searching && <Spinner />}
+                  {`Found ${projects.length} projects`}
+                </>
+              )
+              : <>Search all projects</>}
+          </button>
+          <input
+            type="checkbox"
+            checked={!includeWatchList}
+            onChange={handleChecked}
+          />
+          <label>Search besides watch list</label>
+          <span className="info">
+            {loading
+              ? (
+                <>
+                  <Spinner />
+                  {`Searching for ${query}...`}
+                </>
+              )
+              : <>{`${items.length} results`}</>}
+          </span>
         </div>
+        {error
+          ? <div className="viewer error">{error}</div>
+          : items.length > 0 &&
+            (
+              <div className="viewer">
+                <ul className="dropdown">
+                  {items.map((item) => (
+                    <li key={item.title}>
+                      <Card
+                        {...item}
+                        project={project}
+                        query={query}
+                        close={close}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
       </div>
     </>
   );
-}
-
-export interface MountOption {
-  /** Watch Listからも検索するかどうか
-   *
-   * @default true
-   */
-  includingWatchList?: boolean;
-}
-export function mount(projects = [], option: MountOption = {}) {
-  const app = document.createElement("div");
-  const shadowRoot = app.attachShadow({ mode: "open" });
-  document.body.append(app);
-  render(<App watchList={watchList} />, shadowRoot);
-
-  return () => openForm?.();
-}
+};
