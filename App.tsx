@@ -105,13 +105,13 @@ export const App = ({ watchList, exportOps }: AppProps) => {
         onClick={handleClose}
       >
         <div className="controller">
-          <button className="close-button" onClick={close}>x</button>
           <FuzzySelect
             list={list}
             convert={converter}
             onSelect={onProjectChange}
           />
           <input type="text" value={query} onInput={handleInput} />
+          {loading && <Spinner />}
           <button type="button" onClick={onFilter} disabled={disabled}>
             {disabled
               ? (
@@ -128,35 +128,24 @@ export const App = ({ watchList, exportOps }: AppProps) => {
             onChange={handleChecked}
           />
           <label>Search besides watch list</label>
-          <span className="info">
-            {loading
-              ? (
-                <>
-                  <Spinner />
-                  {`Searching for ${query}...`}
-                </>
-              )
-              : <>{`${items.length} results`}</>}
-          </span>
+          <button className="close-button" onClick={close}>x</button>
         </div>
         {error
           ? <div className="viewer error">{error}</div>
           : items.length > 0 &&
             (
-              <div className="viewer">
-                <ul className="dropdown">
-                  {items.map((item) => (
-                    <li key={item.title}>
-                      <Card
-                        {...item}
-                        project={project}
-                        query={query}
-                        close={close}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="result">
+                {items.map((item) => (
+                  <li key={item.title}>
+                    <Card
+                      {...item}
+                      project={project}
+                      query={query}
+                      close={close}
+                    />
+                  </li>
+                ))}
+              </ul>
             )}
       </div>
     </>

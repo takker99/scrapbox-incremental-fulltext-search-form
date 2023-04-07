@@ -7,20 +7,63 @@ import { h } from "./deps/preact.tsx";
 
 export const CSS = () => (
   <style>
-    {`.container {
-  position: absolute;
-  margin-top: 14px;
-  max-height: 80vh;
-  z-index: 301;
+    {`
 
-  background-color: var(--select-suggest-bg, #111);
-  font-family: var(--select-suggest-font-family, "Open Sans", Helvetica, Arial, "Hiragino Sans", sans-serif);
-  font-size: 14px;
-  color: var(--select-suggest-text-color, #eee);
-  border-radius: 4px;
+.modal {
+  position:fixed;
+  inset:0;
+  z-index:1050;
+  
+  background-color:#000c;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 10px;
+  padding: 10px;
 }
-.candidates {
-  max-width: 80vw;
+.closed {
+  display: none;
+}
+.modal > * {
+  color: var(--page-text-color, #4a4a4a);
+  background-color: var(--page-bg, #fefefe);
+  border: 2px solid var(--body-bg, #dcdde0);
+  border-radius: 4px;
+
+  padding: 5px;
+  width: calc(var(--item-width, 100%) - 10px);
+}
+@media (min-width: 768px) {
+  .modal {
+    padding: 30px;
+  }
+}
+
+.controller {
+  display: flex;
+  gap: 0.2em;
+}
+[type="text"] {
+  width: 100%;
+}
+
+.result {
+  flex-direction: column;
+  width: 100%;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  list-style: none;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 28px;
+  text-align: left;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 4px;
+  background-clip: padding-box;
+  white-space: nowrap;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .candidates:not([data-os*="android"]):not([data-os*="ios"]) {
   font-size:11px;
@@ -51,36 +94,28 @@ export const CSS = () => (
 
 a {
   display: block;
+  padding: 3px 20px;
+  clear: both;
+  align-items: center;
+  font-weight: normal;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   text-decoration: none;
-  color: inherit;
+  text-overflow: ellipsis;
 }
-a:not(.mark) {
-  width: 100%;
+.description {
+  margin-top: 0.5em;
+  color: var(--incremental-fulltext-search-description-text-color, gray);
+  font-size: 12px;
+  line-height: 14px;
+  max-height: 28px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.selected a {
-  background-color: var(--select-suggest-selected-bg, #222);
-  text-decoration: underline
-}
-img {
-  height: 1.3em;
-  width: 1.3em;
-  position: relative;
-  object-fit: cover;
-  object-position: 0% 0%;
-}
-.disabled {
-  filter: grayscale(1.0) opacity(0.5);
-}
-.counter {
-  color: var(--select-suggest-information-text-color, #aaa);
-  font-size: 80%;
-  font-style: italic;
-}
-.progress[style] {
-  padding: unset;
-  border: unset;
-  height: 0.5px;
-  transition: background 0.1s;
-}`}
+
+
+`}
   </style>
 );
