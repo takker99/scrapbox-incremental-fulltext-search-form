@@ -104,6 +104,7 @@ a {
   user-select: none;
   text-decoration: none;
   text-overflow: ellipsis;
+  color: inherit;
 }
 .description {
   margin-top: 0.5em;
