@@ -6,25 +6,24 @@
 import { useEffect, useRef, useState } from "./deps/preact.tsx";
 import {
   ErrorLike,
+  Project,
   searchForJoinedProjects,
   searchForWatchList,
 } from "./deps/scrapbox-rest.ts";
-import { useJoinedProject } from "./useJoinedProjects.ts";
 
 export interface UseProjectSearchOptions {
   watchList?: string[];
 }
-export interface Project {
+export interface ProjectItem {
   name: string;
   displayName: string;
 }
 export const useProjectSearch = (
   query: string,
-  options?: UseProjectSearchOptions,
+  source: readonly Project[],
 ) => {
   /** 検索結果 */
-  const [projects, setProjects] = useState<readonly Project[]>([]);
-  const joined = useJoinedProject();
+  const [projects, setProjects] = useState<readonly ProjectItem[]>([]);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<ErrorLike | undefined>(undefined);
   const done = useRef<Promise<void>>(Promise.resolve());
@@ -33,7 +32,7 @@ export const useProjectSearch = (
   useEffect(() => {
     // 検索語句が空なら、defaultのproject listを返す
     if (query === "") {
-      setProjects(joined);
+      setProjects(source);
       setError(undefined);
       return;
     }
@@ -59,15 +58,16 @@ export const useProjectSearch = (
             setError(result.value);
           }
         }
-        const watchList = options?.watchList ?? [];
+        const watchList = source.map((p) => p.id);
         if (watchList.length === 0) return;
 
+        const chunk = 100;
         // watch listから100件ずつ検索する
-        const chunkNum = Math.floor(watchList.length / 100) + 1;
+        const chunkNum = Math.floor(watchList.length / chunk) + 1;
         for (let index = 0; index < chunkNum; index++) {
           const result = await searchForWatchList(
             query,
-            watchList.slice(index * 1000, (index + 1) * 100),
+            watchList.slice(index * chunk, (index + 1) * chunk),
           );
           if (terminate) return;
           if (result.ok) {
@@ -88,7 +88,7 @@ export const useProjectSearch = (
       }
     })();
     return () => terminate = true;
-  }, [query, options?.watchList]);
+  }, [query, source]);
 
   return { searching, error, projects };
 };

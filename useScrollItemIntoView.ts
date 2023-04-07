@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "./deps/preact.tsx";
 
 /** リスト中の要素が描画領域内に収まるように自動でスクロールするhook */
 export const useScrollItemIntoView = <E extends Element, T>(
-  items: T[],
+  items: readonly T[],
   selected: T | undefined,
   makeKey: (item: T) => string,
 ) => {

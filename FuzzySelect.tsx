@@ -2,40 +2,24 @@
 /// <reference lib="esnext" />
 /// <reference lib="dom" />
 /** @jsx h */
-import {
-  h,
-  RefCallback,
-  useCallback,
-  useEffect,
-  useState,
-} from "./deps/preact.tsx";
+import { h, useCallback, useEffect, useRef, useState } from "./deps/preact.tsx";
 import { useFuzzySearch } from "./useFuzzySearch.ts";
 import { useScrollItemIntoView } from "./useScrollItemIntoView.ts";
+import { ProjectItem } from "./useProjectSearch.ts";
 import { useSelect } from "./useSelect.ts";
-
-interface Position {
-  top: number;
-  left: number;
-}
 
 export interface Item {
   key: string;
   text: string;
 }
 export interface Props {
-  list: Item[];
-  onSelect?: (item: Item) => void;
-  convert: (item: Item) => string;
+  list: readonly ProjectItem[];
+  onSelect?: (item: ProjectItem) => void;
+  convert: (item: ProjectItem) => string;
 }
-export function FuzzySelect({ list: _initialList, onSelect, convert }: Props) {
-  // DropDownの座標計算
-  const [position, setPosition] = useState<Position>({ top: 0, left: 0 });
-  const adjust = useCallback<RefCallback<HTMLInputElement>>((ref) => {
-    const { left = 0, bottom = 0 } = ref?.getBoundingClientRect?.() ??
-      {};
-    setPosition({ top: bottom, left });
-  }, []);
-
+export const FuzzySelect = (
+  { list: _initialList, onSelect, convert }: Props,
+) => {
   const [query, setQuery] = useState("");
   const [display, setDisplay] = useState(""); // <input>に表示する文字列
   const list = useFuzzySearch(query, _initialList, convert);
@@ -49,7 +33,7 @@ export function FuzzySelect({ list: _initialList, onSelect, convert }: Props) {
   useEffect(() => {
     if (!item) return;
     onSelect?.(item);
-    setDisplay(item.text);
+    setDisplay(item.displayName);
   }, [item]);
 
   // 開閉判定・表示する文字列の更新・検索文字列の更新
@@ -58,7 +42,7 @@ export function FuzzySelect({ list: _initialList, onSelect, convert }: Props) {
     ({ currentTarget: { value } }) => {
       setDisplay(value);
       setOpen(true);
-      if (item?.text === value) return;
+      if (item?.displayName === value) return;
       blur();
       setQuery(value);
     },
@@ -75,7 +59,7 @@ export function FuzzySelect({ list: _initialList, onSelect, convert }: Props) {
   // キーボード操作
   const onKeyDown: h.JSX.KeyboardEventHandler<HTMLInputElement> = useCallback(
     (e) => {
-      const { key, shiftKey } = e;
+      const { key } = e;
       if (key === "Escape") {
         e.preventDefault();
         e.stopPropagation();
@@ -92,16 +76,13 @@ export function FuzzySelect({ list: _initialList, onSelect, convert }: Props) {
         return;
       }
 
-      // windowが開いていなければ、focusを別のcomponentに移す
-      if (key === "Tab" && !open) return;
-
-      if (key === "ArrowUp" || (key === "Tab" && shiftKey)) {
+      if (key === "ArrowUp") {
         e.preventDefault();
         e.stopPropagation();
         selectPrev();
         return;
       }
-      if (key === "ArrowDown" || (key === "Tab" && !shiftKey)) {
+      if (key === "ArrowDown") {
         e.preventDefault();
         e.stopPropagation();
         selectNext();
@@ -128,23 +109,28 @@ export function FuzzySelect({ list: _initialList, onSelect, convert }: Props) {
     [selectNext, selectPrev],
   );
 
-  const keys = useScrollItemIntoView(list, item, (item) => item.key);
+  const keys = useScrollItemIntoView(list, item, (item) => item.name);
   const onClickItem: h.JSX.MouseEventHandler<HTMLAnchorElement> = useCallback(
     (e) => {
       // liのdata-keyから、クリックされた要素の番号を計算する
       const li = e.currentTarget.parentElement;
-      const key = li?.dataset?.key ?? list[0].key;
-      const index = list.findIndex((item) => item.key === key);
+      const key = li?.dataset?.key ?? list[0].name;
+      const index = list.findIndex((item) => item.name === key);
       select(Math.min(index, 0));
       setOpen(false);
     },
     [list],
   );
 
+  // DropDownの座標計算用
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { bottom = 0, left = 0 } =
+    inputRef.current?.getBoundingClientRect?.() ?? {};
+
   return (
-    <span style="position: relative;">
+    <div className="fuzzy-select">
       <input
-        ref={adjust}
+        ref={inputRef}
         type="text"
         value={display}
         onInput={onInput}
@@ -156,12 +142,19 @@ export function FuzzySelect({ list: _initialList, onSelect, convert }: Props) {
       {open && (
         <ul
           className="dropdown"
-          style={{ top: `${position.top}px`, left: `${position.left}px` }}
+          style={{
+            top: `${bottom}px`,
+            left: `${left}px`,
+          }}
         >
           {list.length > 0
-            ? list.map(({ key, text }, index) => (
-              <li key={key} {...keys[index]}>
-                <a onClick={onClickItem}>{text}</a>
+            ? list.map(({ name, displayName }, index) => (
+              <li
+                key={name}
+                {...keys[index]}
+                {...(name === item?.name ? { className: "selected" } : {})}
+              >
+                <a onClick={onClickItem}>{displayName}</a>
               </li>
             ))
             : (
@@ -171,6 +164,6 @@ export function FuzzySelect({ list: _initialList, onSelect, convert }: Props) {
             )}
         </ul>
       )}
-    </span>
+    </div>
   );
-}
+};

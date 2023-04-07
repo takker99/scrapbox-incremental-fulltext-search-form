@@ -5,7 +5,7 @@ export interface Options {
   defaultSelected?: number;
 }
 
-export const useSelect = <T>(list: T[], {
+export const useSelect = <T>(list: readonly T[], {
   defaultSelected,
 }: Options = {}) => {
   const [index, setIndex] = useState(defaultSelected); // 未選択のときはundefinedになる

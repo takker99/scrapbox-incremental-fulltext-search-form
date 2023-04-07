@@ -12,18 +12,20 @@ import {
   useRef,
   useState,
 } from "./deps/preact.tsx";
-import { FuzzySelect, Item } from "./FuzzySelect.tsx";
+import { FuzzySelect } from "./FuzzySelect.tsx";
 import { Card } from "./Card.tsx";
 import { useOpen, UseOpenOperators } from "./useOpen.ts";
 import { useSearch } from "./useSearch.ts";
-import { useProjectSearch } from "./useProjectSearch.ts";
+import { ProjectItem, useProjectSearch } from "./useProjectSearch.ts";
+import { useProjects } from "./useProjects.ts";
 import { CSS } from "./CSS.tsx";
 import type { Scrapbox } from "./deps/scrapbox.ts";
 declare const scrapbox: Scrapbox;
 
-const Spinner = () => <i className="" />;
+const Spinner = () => <i className="spinner" />;
 
-const converter = ({ key, text }: Item) => `${key} ${text}`;
+const converter = ({ name, displayName }: ProjectItem) =>
+  `${name} ${displayName}`;
 
 export interface AppProps {
   watchList: string[];
@@ -42,22 +44,14 @@ export const App = ({ watchList, exportOps }: AppProps) => {
   const onFilter = useCallback(() => setDisabled(true), []);
 
   const [includeWatchList, setIncludeWatchList] = useState(false);
-  const watchList_ = useMemo(() => includeWatchList ? watchList : [], [
-    includeWatchList,
-    watchList,
-  ]);
-  const { searching, error, projects } = useProjectSearch(queryForProject, {
-    watchList: watchList_,
-  });
-
-  /** FuzzySelect用データ */
-  const list = useMemo(
-    () =>
-      projects.map(({ name, displayName }) => ({
-        key: name,
-        text: displayName,
-      })),
-    [projects],
+  const source_ = useProjects(watchList);
+  const source = useMemo(
+    () => includeWatchList ? source_ : source_.filter((p) => p.isMember),
+    [includeWatchList, source_],
+  );
+  const { searching, error, projects } = useProjectSearch(
+    queryForProject,
+    source,
   );
 
   // 横断検索のAPI limitに引っかかっているときはボタンを無効化する
@@ -65,7 +59,10 @@ export const App = ({ watchList, exportOps }: AppProps) => {
 
   const [project, setProject] = useState(scrapbox.Project.name);
   // 入力欄の値を反映する
-  const onProjectChange = useCallback(({ key }: Item) => setProject(key), []);
+  const onProjectChange = useCallback(
+    ({ name }: ProjectItem) => setProject(name),
+    [],
+  );
   // 全文検索する
   const { loading, items } = useSearch(project, query);
 
@@ -106,12 +103,11 @@ export const App = ({ watchList, exportOps }: AppProps) => {
       >
         <div className="controller">
           <FuzzySelect
-            list={list}
+            list={source}
             convert={converter}
             onSelect={onProjectChange}
           />
           <input type="text" value={query} onInput={handleInput} />
-          {loading && <Spinner />}
           <button type="button" onClick={onFilter} disabled={disabled}>
             {disabled
               ? (
@@ -124,7 +120,7 @@ export const App = ({ watchList, exportOps }: AppProps) => {
           </button>
           <input
             type="checkbox"
-            checked={!includeWatchList}
+            checked={includeWatchList}
             onChange={handleChecked}
           />
           <label>Search besides watch list</label>
@@ -134,18 +130,24 @@ export const App = ({ watchList, exportOps }: AppProps) => {
           ? <div className="viewer error">{error}</div>
           : items.length > 0 &&
             (
-              <ul className="result">
-                {items.map((item) => (
-                  <li key={item.title}>
-                    <Card
-                      {...item}
-                      project={project}
-                      query={query}
-                      close={close}
-                    />
-                  </li>
-                ))}
-              </ul>
+              <>
+                <div className="info">
+                  {loading && <Spinner />}
+                  {`${items.length} pages`}
+                </div>
+                <ul className="result">
+                  {items.map((item) => (
+                    <li key={item.title}>
+                      <Card
+                        {...item}
+                        project={project}
+                        query={query}
+                        close={close}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
       </div>
     </>

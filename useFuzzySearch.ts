@@ -9,11 +9,11 @@ import { Asearch } from "./deps/asearch.ts";
  */
 export const useFuzzySearch = <T>(
   query: string,
-  candidates: T[],
+  candidates: readonly T[],
   converter: (candidate: T) => string,
 ) =>
   useMemo(() => {
-    if (!query || query === "") return candidates;
+    if (!query) return candidates;
 
     const { match } = Asearch(` ${query} `);
     return candidates.flatMap((candidate) => {
