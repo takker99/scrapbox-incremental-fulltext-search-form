@@ -23,8 +23,6 @@ export const Card = ({ project, title, lines, query, close }: CardProps) => {
     (e: h.JSX.TargetedMouseEvent<HTMLAnchorElement>) => {
       pushPageTransition({ type: "search", query, to: { project, title } });
       if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
-      e.preventDefault();
-      e.stopPropagation();
       close();
     },
     [project, title, query, close],

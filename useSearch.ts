@@ -17,6 +17,11 @@ export const useSearch = (project: string, query: string): UserSearchResult => {
 
   const done = useRef<Promise<void>>(Promise.resolve());
   useEffect(() => {
+    if (query === "") {
+      setItems((prev) => prev.length === 0 ? prev : []);
+      return;
+    }
+
     let terminate = false;
     done.current = (async () => {
       await done.current;
