@@ -85,8 +85,16 @@ export const App = ({ watchList, exportOps }: AppProps) => {
   const exportRef = useRef<UseOpenOperators>({ open, close, toggle });
   useEffect(() => {
     Object.assign(exportRef.current, { open, close, toggle });
-  }, [open, close, toggle]);
+  }, []);
   useEffect(() => exportOps(exportRef.current), [exportOps]);
+  const handleClose = useCallback(
+    (e: h.JSX.TargetedMouseEvent<HTMLDivElement>) => {
+      if (!(e.target instanceof HTMLElement)) return;
+      if (e.target.id !== "background") return;
+      close();
+    },
+    [],
+  );
 
   return (
     <>
@@ -94,7 +102,7 @@ export const App = ({ watchList, exportOps }: AppProps) => {
       <div
         id="background"
         className={`modal${!isOpen ? " closed" : ""}`}
-        onClick={close}
+        onClick={handleClose}
       >
         <div className="controller">
           <button className="close-button" onClick={close}>x</button>
