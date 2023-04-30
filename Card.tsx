@@ -2,23 +2,27 @@
 /// <reference lib="esnext" />
 /// <reference lib="dom" />
 /** @jsx h */
-import { h, useCallback } from "./deps/preact.tsx";
+import { h, useCallback, useMemo } from "./deps/preact.tsx";
 import {
   encodeTitleURI,
   pushPageTransition,
   Scrapbox,
 } from "./deps/scrapbox.ts";
+import { SearchResult } from "./deps/scrapbox-rest.ts";
+import { escapeRegExp } from "./escapeRegExp.ts";
 declare const scrapbox: Scrapbox;
 
-export interface CardProps {
+export type Page = SearchResult["pages"][0];
+
+export interface CardProps extends Page {
   project: string;
-  title: string;
-  lines: string[];
   query: string;
   close: () => void;
 }
 
-export const Card = ({ project, title, lines, query, close }: CardProps) => {
+export const Card = (
+  { project, title, words, lines, query, close }: CardProps,
+) => {
   const handleClick = useCallback(
     (e: h.JSX.TargetedMouseEvent<HTMLAnchorElement>) => {
       pushPageTransition({ type: "search", query, to: { project, title } });
@@ -27,6 +31,21 @@ export const Card = ({ project, title, lines, query, close }: CardProps) => {
     },
     [project, title, query, close],
   );
+
+  const highlightedLines = useMemo(() => {
+    const regExp = new RegExp(
+      `(${words.map((word) => escapeRegExp(word)).join("|")})`,
+      "i",
+    );
+    return lines.flatMap((line) => {
+      const words = line.split(regExp);
+      return (
+        <span>
+          {words.map((word, i) => i % 2 === 0 ? word : <strong>{word}</strong>)}
+        </span>
+      );
+    });
+  }, [lines, words]);
 
   return (
     <a
@@ -39,7 +58,7 @@ export const Card = ({ project, title, lines, query, close }: CardProps) => {
     >
       {title}
       <div className="description">
-        {lines.map((line) => <span>{line}</span>)}
+        {highlightedLines}
       </div>
     </a>
   );
