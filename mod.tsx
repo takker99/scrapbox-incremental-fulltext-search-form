@@ -18,15 +18,14 @@ export interface Operators {
 
 /** search formを起動する
  *
- * @param watchList 横断検索に使うproject idsのリスト
  * @return formの開閉操作関数
  */
-export const setup = (watchList: string[]): Promise<Operators> => {
+export const setup = (): Promise<Operators> => {
   const app = document.createElement("div");
   const shadowRoot = app.attachShadow({ mode: "open" });
   document.body.append(app);
 
   return new Promise<Operators>((resolve) => {
-    render(<App watchList={watchList} exportOps={resolve} />, shadowRoot);
+    render(<App exportOps={resolve} />, shadowRoot);
   });
 };

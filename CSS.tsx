@@ -7,9 +7,7 @@ import { h } from "./deps/preact.tsx";
 
 export const CSS = () => (
   <style>
-    {`
-
-.modal {
+    {`.modal {
   position:fixed;
   inset:0;
   z-index:1050;
@@ -43,9 +41,16 @@ export const CSS = () => (
 .controller {
   display: flex;
   gap: 0.2em;
+  flex-direction: column;
 }
-[type="text"] {
-  flex-grow: 0;
+input {
+  border-radius: 5px;
+  padding: 0 10px;
+  height: 32px;
+  border: transparent;
+  box-shadow: none;
+  color: var(--search-form-text-color, rgba(255, 255, 255, 0.35));
+  background-color: var(--search-form-bg, rgba(255, 255, 255, 0.15))
 }
 
 .result {
@@ -86,35 +91,9 @@ a {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.dropdown {
-  position: absolute;
-  left: 0;
-  z-index: 1000;
-  min-width: 160px;
-  max-width: 50vw;
-  max-height: 80vh;
-  padding: 5px 0;
-  margin: 2px 0 0;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 28px;
-  text-align: left;
-  color: var(--dropdown-text-color, #333);
-  background-color: var(--dropdown-bg, #fff);
-  border: 1px solid var(--dropdown-border-color, rgba(0,0,0,0.15));
-  border-radius: 4px;
-  box-shadow: 0 6px 12px var(--dropdown-shadow-color, rgba(0,0,0,0.175));
-  background-clip: padding-box;
-  white-space: nowrap;
-  flex-direction: column;
-  list-style: none;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-.dropdown a {
-  width: 100%;
+.description strong {
+  background-color: #ff0;
+  color: #666;
 }
 
 .spinner::before {
@@ -130,8 +109,6 @@ a {
   padding: 0;
   box-sizing: border-box;
   animation: fa-spin 2s linear infinite;
-}
-
-`}
+}`}
   </style>
 );

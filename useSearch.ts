@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "./deps/preact.tsx";
-import { searchForPages } from "./deps/scrapbox-rest.ts";
+import { searchForPages, SearchResult } from "./deps/scrapbox-rest.ts";
 
 export interface FoundPage {
   title: string;
@@ -8,17 +8,17 @@ export interface FoundPage {
 }
 export interface UserSearchResult {
   loading: boolean;
-  items: FoundPage[];
+  result?: SearchResult;
 }
 
 export const useSearch = (project: string, query: string): UserSearchResult => {
-  const [items, setItems] = useState<FoundPage[]>([]);
+  const [result, setItems] = useState<SearchResult | undefined>();
   const [loading, setLoading] = useState(false);
 
   const done = useRef<Promise<void>>(Promise.resolve());
   useEffect(() => {
     if (query === "") {
-      setItems((prev) => prev.length === 0 ? prev : []);
+      setItems(undefined);
       return;
     }
 
@@ -31,7 +31,7 @@ export const useSearch = (project: string, query: string): UserSearchResult => {
       try {
         const result = await searchForPages(query, project);
         if (terminate) return;
-        setItems(result.ok ? result.value.pages : []);
+        setItems(result.ok ? result.value : undefined);
       } finally {
         setLoading(false);
       }
@@ -40,5 +40,5 @@ export const useSearch = (project: string, query: string): UserSearchResult => {
     return () => terminate = true;
   }, [query, project]);
 
-  return { loading, items };
+  return { loading, result };
 };
