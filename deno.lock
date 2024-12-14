@@ -1,0 +1,61 @@
+{
+  "version": "4",
+  "specifiers": {
+    "jsr:@core/unknownutil@4": "4.3.0",
+    "jsr:@cosense/std@0.29": "0.29.2",
+    "jsr:@cosense/types@0.10": "0.10.1",
+    "jsr:@std/async@1": "1.0.9",
+    "jsr:@std/encoding@1": "1.0.5",
+    "jsr:@std/regexp@1": "1.0.0",
+    "jsr:@takker/md5@0.1": "0.1.0",
+    "npm:option-t@5": "5.0.0",
+    "npm:option-t@50": "50.0.1",
+    "npm:option-t@51": "51.0.0",
+    "npm:preact@10": "10.25.1"
+  },
+  "jsr": {
+    "@core/unknownutil@4.3.0": {
+      "integrity": "538a3687ffa81028e91d148818047df219663d0da671d906cecd165581ae55cc"
+    },
+    "@cosense/std@0.29.2": {
+      "integrity": "668d473666b38cf8320394dfb96d31625b3856716f591671687d245af211f3d4",
+      "dependencies": [
+        "jsr:@core/unknownutil",
+        "jsr:@cosense/types",
+        "jsr:@std/async",
+        "jsr:@std/encoding",
+        "jsr:@takker/md5",
+        "npm:option-t@50"
+      ]
+    },
+    "@cosense/types@0.10.1": {
+      "integrity": "13d2488a02c7b0b035a265bc3299affbdab1ea5b607516379685965cd37b2058"
+    },
+    "@std/async@1.0.9": {
+      "integrity": "c6472fd0623b3f3daae023cdf7ca5535e1b721dfbf376562c0c12b3fb4867f91"
+    },
+    "@std/encoding@1.0.5": {
+      "integrity": "ecf363d4fc25bd85bd915ff6733a7e79b67e0e7806334af15f4645c569fefc04"
+    },
+    "@std/regexp@1.0.0": {
+      "integrity": "158628d134c49a0858afe05017c4666f5f73d3a56602c346549ca42f3fab244a"
+    },
+    "@takker/md5@0.1.0": {
+      "integrity": "4c423d8247aadf7bcb1eb83c727bf28c05c21906e916517395d00aa157b6eae0"
+    }
+  },
+  "npm": {
+    "option-t@5.0.0": {
+      "integrity": "sha512-D1ZEzOnmCEuBjZpBRzrHkN6EGUf5wR5ZjVZj/IDAnPksybfGoJogWnedOZp+M1fHi6A0fb13y0qtqifBxdxKSw=="
+    },
+    "option-t@50.0.1": {
+      "integrity": "sha512-QZkAjLrO0fY8DICD0tXJtjnsd7wGjgDDyPOvRf+bmIZAwAt98V0TiQ2JqN9gElAxHw2Dz376lPrZtvimcBGAbA=="
+    },
+    "option-t@51.0.0": {
+      "integrity": "sha512-qgmiuyGKqWdK/dWxX6JX8KX/I0XPyKKZysKioMqXz5+uElzYe+Av5LyF5rMXiBDD2/46RnWrHRYwsKeo5jht2A=="
+    },
+    "preact@10.25.1": {
+      "integrity": "sha512-frxeZV2vhQSohQwJ7FvlqC40ze89+8friponWUFeVEkaCfhC6Eu4V0iND5C9CXz8JLndV07QRDeXzH1+Anz5Og=="
+    }
+  }
+}

@@ -1,7 +1,4 @@
-/// <reference no-default-lib="lib" />
-/// <reference lib="esnext" />
-/// <reference lib="dom" />
-/** @jsx h */
+/** @jsxImportSource npm:preact@10 */
 import { h, useCallback, useMemo } from "./deps/preact.tsx";
 import {
   encodeTitleURI,
@@ -9,7 +6,7 @@ import {
   Scrapbox,
 } from "./deps/scrapbox.ts";
 import { SearchResult } from "./deps/scrapbox-rest.ts";
-import { escapeRegExp } from "./escapeRegExp.ts";
+import { escape } from "./deps/regexp.ts";
 declare const scrapbox: Scrapbox;
 
 export type Page = SearchResult["pages"][0];
@@ -34,7 +31,7 @@ export const Card = (
 
   const highlightedLines = useMemo(() => {
     const regExp = new RegExp(
-      `(${words.map((word) => escapeRegExp(word)).join("|")})`,
+      `(${words.map((word) => escape(word)).join("|")})`,
       "i",
     );
     return lines.flatMap((line) => {

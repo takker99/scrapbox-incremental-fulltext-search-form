@@ -1,3 +1,4 @@
+import { isOk, unwrapOk } from "./deps/option-t.ts";
 import { useEffect, useRef, useState } from "./deps/preact.tsx";
 import { searchForPages, SearchResult } from "./deps/scrapbox-rest.ts";
 
@@ -31,7 +32,7 @@ export const useSearch = (project: string, query: string): UserSearchResult => {
       try {
         const result = await searchForPages(query, project);
         if (terminate) return;
-        setItems(result.ok ? result.value : undefined);
+        setItems(isOk(result) ? unwrapOk(result) : undefined);
       } finally {
         setLoading(false);
       }
