@@ -1,2 +1,2 @@
-export * from "https://raw.githubusercontent.com/takker99/scrapbox-userscript-std/0.23.1/rest/mod.ts";
-export * from "https://raw.githubusercontent.com/scrapbox-jp/types/0.4.2/rest.ts";
+export * from "jsr:@cosense/std@0.29/rest";
+export type { SearchResult } from "jsr:@cosense/types@0.10/rest";

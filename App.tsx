@@ -1,16 +1,5 @@
-/// <reference no-default-lib="lib" />
-/// <reference lib="esnext" />
-/// <reference lib="dom" />
-/** @jsx h */
-/** @jsxFrag Fragment */
-import {
-  Fragment,
-  h,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "./deps/preact.tsx";
+/** @jsxImportSource npm:preact@10 */
+import { h, useCallback, useEffect, useRef, useState } from "./deps/preact.tsx";
 import { Card } from "./Card.tsx";
 import { useOpen, UseOpenOperators } from "./useOpen.ts";
 import { useSearch } from "./useSearch.ts";

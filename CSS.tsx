@@ -1,19 +1,13 @@
-/// <reference no-default-lib="true" />
-/// <reference lib="esnext" />
-/// <reference lib="dom" />
-/** @jsx h */
-
-import { h } from "./deps/preact.tsx";
-
+/** @jsxImportSource npm:preact@10 */
 export const CSS = () => (
   <style>
     {`.modal {
   position:fixed;
   inset:0;
   z-index:1050;
-  
+
   background-color:#000c;
-  
+
   display: flex;
   flex-direction: column;
   align-items: center;

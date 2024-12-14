@@ -1,10 +1,8 @@
-/// <reference no-default-lib="lib" />
-/// <reference lib="esnext" />
-/// <reference lib="dom" />
-/** @jsx h */
-import { h, render } from "./deps/preact.tsx";
+/** @jsxImportSource npm:preact@10 */
+import { render } from "./deps/preact.tsx";
 import { App } from "./App.tsx";
 
+/** search formの操作関数 */
 export interface Operators {
   /** formを開く */
   open: () => void;

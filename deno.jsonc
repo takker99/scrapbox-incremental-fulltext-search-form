@@ -1,0 +1,13 @@
+{
+  "tasks": {
+    "fix": "deno fmt && deno lint --fix && deno doc --lint mod.tsx && deno check --remote **/*.ts **/*.tsx && deno test --doc --parallel --shuffle",
+    "check": "deno fmt --check && deno lint && deno doc --lint mod.tsx && deno check --remote **/*.ts **/*.tsx && deno test --doc --parallel --shuffle"
+  },
+  "compilerOptions": {
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable"
+    ]
+  }
+}
