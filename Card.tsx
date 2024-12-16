@@ -1,3 +1,4 @@
+/** @jsxRuntime automatic */
 /** @jsxImportSource npm:preact@10 */
 import { h, useCallback, useMemo } from "./deps/preact.tsx";
 import {

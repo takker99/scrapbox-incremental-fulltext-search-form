@@ -1,3 +1,4 @@
+/** @jsxRuntime automatic */
 /** @jsxImportSource npm:preact@10 */
 import { render } from "./deps/preact.tsx";
 import { App } from "./App.tsx";
