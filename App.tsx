@@ -1,3 +1,4 @@
+/** @jsxRuntime automatic */
 /** @jsxImportSource npm:preact@10 */
 import { h, useCallback, useEffect, useRef, useState } from "./deps/preact.tsx";
 import { Card } from "./Card.tsx";
